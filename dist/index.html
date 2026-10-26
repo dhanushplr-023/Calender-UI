@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cosmic Calendar - Modern Glassmorphic Schedule & Planner</title>
+  <meta name="description" content="A futuristic, modern cosmic calendar dashboard featuring real-time task management, schedule tracking, resource consumption gauge, and interactive event planner.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <script type="module" crossorigin src="/assets/index-CqpFeiFe.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-Baqz1Grn.css">
+</head>
+<body>
+  <!-- Starry Cosmic Canvas Background -->
+  <canvas id="cosmic-canvas" aria-hidden="true"></canvas>
+  <div class="cosmic-nebula-glow" aria-hidden="true"></div>
+
+  <!-- Main App Shell -->
+  <div class="app-container">
+    
+    <!-- Top Global Header -->
+    <header class="app-header">
+      <!-- Left: Logo & Nav Pill Switcher -->
+      <div class="header-left">
+        <div class="brand-logo" id="brand-logo">
+          <div class="brand-orb">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="9"/>
+              <path d="M12 3a9 9 0 0 1 9 9M12 7a5 5 0 0 1 5 5"/>
+            </svg>
+          </div>
+          <span class="brand-text">Astra<span class="accent-text">Plan</span></span>
+        </div>
+
+        <!-- Navigation Pill Switcher matching the screenshot -->
+        <nav class="nav-pill-tabs" id="nav-pill-tabs" role="tablist" aria-label="Main Navigation">
+          <button class="nav-tab-btn" id="tab-dashboard" role="tab" aria-selected="false">Dashboard</button>
+          <button class="nav-tab-btn active" id="tab-calendar" role="tab" aria-selected="true">
+            <span>Calender</span>
+            <span class="active-dot"></span>
+          </button>
+          <button class="nav-tab-btn" id="tab-messages" role="tab" aria-selected="false">
+            <span>Messages</span>
+            <span class="badge-count">3</span>
+          </button>
+        </nav>
+      </div>
+
+      <!-- Center: View Toggle Pill & Search/Filter Controls -->
+      <div class="header-center">
+        <!-- View Toggle (Month / Week / Day / Year) -->
+        <div class="view-toggle-pill" id="view-toggle-pill" role="radiogroup" aria-label="Calendar View">
+          <button class="view-btn active" data-view="month" id="btn-view-month">Month</button>
+          <button class="view-btn" data-view="week" id="btn-view-week">Week</button>
+          <button class="view-btn" data-view="day" id="btn-view-day">Day</button>
+          <button class="view-btn" data-view="year" id="btn-view-year">Year</button>
+        </div>
+
+        <!-- Quick Search -->
+        <div class="search-box">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" id="event-search-input" placeholder="Search events & tasks..." aria-label="Search events">
+          <button class="clear-search-btn" id="clear-search-btn" aria-label="Clear search" style="display:none;">&times;</button>
+        </div>
+      </div>
+
+      <!-- Right: Action Controls & User Profile -->
+      <div class="header-right">
+        <!-- Jump to Today -->
+        <button class="action-pill-btn" id="btn-today" title="Jump to Today (Hotkey: T)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          <span>Today</span>
+        </button>
+
+        <!-- Sound Toggle -->
+        <button class="icon-circle-btn" id="sound-toggle-btn" title="Toggle audio chimes" aria-label="Toggle Sound">
+          <svg id="sound-icon-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          </svg>
+          <svg id="sound-icon-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <line x1="23" y1="9" x2="17" y2="15"/>
+            <line x1="17" y1="9" x2="23" y2="15"/>
+          </svg>
+        </button>
+
+        <!-- Export Menu Button -->
+        <div class="dropdown-wrapper">
+          <button class="icon-circle-btn" id="export-dropdown-btn" title="Export & Backup" aria-label="Export Menu">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+              <polyline points="7 10 12 15 17 10"/>
+              <line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+          </button>
+          <div class="dropdown-menu" id="export-dropdown-menu">
+            <button class="dropdown-item" id="btn-export-ical">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span>Export as iCalendar (.ics)</span>
+            </button>
+            <button class="dropdown-item" id="btn-export-json">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              <span>Backup Data (.json)</span>
+            </button>
+            <button class="dropdown-item" id="btn-reset-demo">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+              <span>Reset to Demo Data</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- User Profile Pill -->
+        <div class="user-pill">
+          <img src="/assets/avatar_team-l_KA60sB.jpg" alt="Annisa Profile" class="user-avatar" id="header-avatar">
+          <div class="user-info">
+            <span class="user-name">Annisa</span>
+            <span class="user-role">Student & Pro</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Dashboard Grid Layout matching the image exactly -->
+    <main class="dashboard-grid">
+      
+      <!-- ================= LEFT COLUMN ================= -->
+      <section class="left-column" aria-label="Overview and Schedule Form">
+        
+        <!-- Top Left Widget: Resource Consumption -->
+        <article class="glass-card resource-card" id="resource-consumption-card">
+          <div class="card-wave-bg" aria-hidden="true">
+            <svg viewBox="0 0 400 200" preserveAspectRatio="none">
+              <path d="M0,100 C80,60 160,140 240,90 C320,40 380,110 400,90 L400,200 L0,200 Z" fill="rgba(6, 182, 212, 0.08)" />
+              <path d="M0,130 C90,90 180,160 270,110 C340,70 380,130 400,120 L400,200 L0,200 Z" fill="rgba(34, 211, 238, 0.05)" />
+            </svg>
+          </div>
+
+          <h2 class="card-title">Resource consumption</h2>
+
+          <div class="resource-content">
+            <!-- Circular Animated Donut Ring -->
+            <div class="gauge-wrapper">
+              <svg class="gauge-svg" viewBox="0 0 160 160">
+                <defs>
+                  <linearGradient id="cyanGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#06b6d4" />
+                    <stop offset="100%" stop-color="#22d3ee" />
+                  </linearGradient>
+                  <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="0" dy="0" stdDeviation="5" flood-color="#22d3ee" flood-opacity="0.6"/>
+                  </filter>
+                </defs>
+                <!-- Track circle -->
+                <circle class="gauge-track" cx="80" cy="80" r="62" />
+                <!-- Progress circle -->
+                <circle class="gauge-progress" id="gauge-progress-circle" cx="80" cy="80" r="62" 
+                        stroke="url(#cyanGradient)" filter="url(#glow)"/>
+              </svg>
+              <div class="gauge-label">
+                <span class="gauge-percent" id="gauge-percent-display">45%</span>
+              </div>
+            </div>
+
+            <!-- Stats List on Right -->
+            <div class="resource-stats">
+              <div class="stat-item">
+                <span class="stat-number" id="stat-total-tasks">30</span>
+                <span class="stat-desc">Total tasks</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-number" id="stat-in-progress">15</span>
+                <span class="stat-desc">In progress</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-number" id="stat-completed-tasks">29</span>
+                <span class="stat-desc">Completed task</span>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Bottom Left Widget: Hello Annisa & New Event Form -->
+        <article class="glass-card event-form-card" id="event-editor-card">
+          <div class="form-header">
+            <div class="user-greeting">
+              <h2 class="greeting-title" id="greeting-title">Hello, Annisa</h2>
+              <p class="greeting-subtitle" id="greeting-subtitle">Add your schedule</p>
+            </div>
+            
+            <button class="new-event-pill-btn" id="btn-toggle-new-event">
+              <span>New event</span>
+              <div class="pill-plus-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+              </div>
+            </button>
+          </div>
+
+          <!-- Schedule Input Form matching image details -->
+          <form class="event-form" id="schedule-form" onsubmit="return false;">
+            <!-- Hidden ID if editing -->
+            <input type="hidden" id="form-event-id" value="">
+
+            <!-- Title field -->
+            <div class="form-row">
+              <label for="form-title" class="form-label">Title</label>
+              <div class="form-control-wrapper">
+                <input type="text" id="form-title" class="text-input" placeholder="e.g., Chemistry challenge" required>
+              </div>
+            </div>
+
+            <!-- Date Row -->
+            <div class="form-row">
+              <label for="form-date" class="form-label">Date</label>
+              <div class="form-control-wrapper">
+                <input type="date" id="form-date" class="date-input" value="2022-02-16">
+                <div class="styled-date-display" id="styled-date-display">
+                  Thursday, 16 February 2022
+                </div>
+              </div>
+            </div>
+
+            <!-- Type / Category Row -->
+            <div class="form-row">
+              <label for="form-category" class="form-label">Type</label>
+              <div class="form-control-wrapper custom-select-wrapper">
+                <div class="type-badge-indicator" id="category-dot-indicator"></div>
+                <select id="form-category" class="custom-select" aria-label="Event Type">
+                  <option value="social" data-color="#fb7185" selected>Meeting with friends</option>
+                  <option value="education" data-color="#38bdf8">Mathematic / Chemistry</option>
+                  <option value="work" data-color="#2dd4bf">Work & Projects</option>
+                  <option value="arts" data-color="#c084fc">Music assessment / Concert</option>
+                  <option value="outdoor" data-color="#f97316">Climbing / Adventure</option>
+                  <option value="celebration" data-color="#f43f5e">Birthday / Party</option>
+                  <option value="personal" data-color="#34d399">Personal & Routine</option>
+                </select>
+                <div class="select-chevron">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- Hour Range Row -->
+            <div class="form-row">
+              <label class="form-label">Hour</label>
+              <div class="time-range-group">
+                <div class="time-picker-pill">
+                  <select id="form-start-time" class="time-select" aria-label="Start time">
+                    <option value="08:00">08:00 AM</option>
+                    <option value="08:30">08:30 AM</option>
+                    <option value="09:00">09:00 AM</option>
+                    <option value="09:30" selected>09:30 AM</option>
+                    <option value="10:00">10:00 AM</option>
+                    <option value="10:30">10:30 AM</option>
+                    <option value="11:00">11:00 AM</option>
+                    <option value="11:30">11:30 AM</option>
+                    <option value="12:00">12:00 PM</option>
+                    <option value="13:00">13:00 PM</option>
+                    <option value="14:00">14:00 PM</option>
+                    <option value="15:00">15:00 PM</option>
+                    <option value="16:00">16:00 PM</option>
+                    <option value="17:00">17:00 PM</option>
+                    <option value="18:00">18:00 PM</option>
+                    <option value="19:00">19:00 PM</option>
+                    <option value="20:00">20:00 PM</option>
+                  </select>
+                  <svg class="chevron-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"/>
+                  </svg>
+                </div>
+                
+                <span class="time-divider">~</span>
+
+                <div class="time-picker-pill">
+                  <select id="form-end-time" class="time-select" aria-label="End time">
+                    <option value="09:00">09:00 AM</option>
+                    <option value="10:00">10:00 AM</option>
+                    <option value="11:00">11:00 AM</option>
+                    <option value="12:00">12:00 PM</option>
+                    <option value="13:00">13:00 PM</option>
+                    <option value="14:00" selected>14:00 PM</option>
+                    <option value="15:00">15:00 PM</option>
+                    <option value="16:00">16:00 PM</option>
+                    <option value="17:00">17:00 PM</option>
+                    <option value="18:00">18:00 PM</option>
+                    <option value="19:00">19:00 PM</option>
+                    <option value="21:00">21:00 PM</option>
+                    <option value="22:00">22:00 PM</option>
+                  </select>
+                  <svg class="chevron-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <!-- Note Textarea -->
+            <div class="form-row note-row">
+              <label for="form-notes" class="form-label">Note</label>
+              <div class="form-control-wrapper">
+                <textarea id="form-notes" class="note-textarea" rows="3" placeholder="Write..."></textarea>
+              </div>
+            </div>
+
+            <!-- Share to Row matching image avatars -->
+            <div class="form-row share-row">
+              <label class="form-label">Share to</label>
+              <div class="collaborators-container">
+                <div class="avatar-stack" id="collaborator-avatars-list">
+                  <!-- Dynamically rendered collaborator avatars -->
+                </div>
+                
+                <!-- Remove and Add action buttons -->
+                <div class="share-actions">
+                  <button type="button" class="btn-share-tool" id="btn-remove-last-collab" title="Remove selected collaborator" aria-label="Remove collaborator">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <polyline points="3 6 5 6 21 6"/>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                    </svg>
+                  </button>
+                  <button type="button" class="btn-share-tool" id="btn-add-collab" title="Add collaborator" aria-label="Add collaborator">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <line x1="12" y1="5" x2="12" y2="19"></line>
+                      <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Submit Button (Pill shaped with glowing cyan) -->
+            <div class="form-submit-wrapper">
+              <button type="submit" class="glow-submit-btn" id="btn-submit-event">
+                <span id="submit-btn-text">Create</span>
+                <span class="btn-glow-layer"></span>
+              </button>
+              <button type="button" class="btn-cancel-edit" id="btn-cancel-edit" style="display:none;">
+                Cancel
+              </button>
+            </div>
+          </form>
+        </article>
+      </section>
+
+      <!-- ================= RIGHT COLUMN ================= -->
+      <section class="right-column" aria-label="Calendar and Task Dashboard">
+        
+        <!-- Top Row: Mini Month Picker & Task List -->
+        <div class="top-widgets-row">
+          
+          <!-- Mini Month Picker Widget -->
+          <article class="glass-card mini-calendar-card" id="mini-calendar-widget">
+            <div class="mini-cal-header">
+              <h2 class="mini-cal-title" id="mini-cal-month-title">February 2022</h2>
+              
+              <div class="mini-cal-right-tools">
+                <!-- Month / Year Switcher Pill -->
+                <div class="mini-toggle-pill" id="mini-toggle-pill">
+                  <button class="mini-toggle-btn active" id="mini-toggle-month">Month</button>
+                  <button class="mini-toggle-btn" id="mini-toggle-year">Year</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mini Day Names (Mo, Tu, We, Th, Fr, Sa, Su) -->
+            <div class="mini-cal-grid-header">
+              <span>Mo</span>
+              <span>Tu</span>
+              <span>We</span>
+              <span>Th</span>
+              <span>Fr</span>
+              <span>Sa</span>
+              <span>Su</span>
+            </div>
+
+            <!-- Mini Calendar Dates Grid with left/right arrows -->
+            <div class="mini-cal-body">
+              <button class="mini-nav-arrow prev" id="mini-prev-month" title="Previous Month" aria-label="Previous Month">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="15 18 9 12 15 6"/>
+                </svg>
+              </button>
+
+              <div class="mini-cal-dates" id="mini-cal-dates-grid">
+                <!-- Generated dynamically with JS -->
+              </div>
+
+              <button class="mini-nav-arrow next" id="mini-next-month" title="Next Month" aria-label="Next Month">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="9 18 15 12 9 6"/>
+                </svg>
+              </button>
+            </div>
+          </article>
+
+          <!-- Task List Widget -->
+          <article class="glass-card task-list-card" id="task-list-widget">
+            <div class="task-list-header">
+              <h2 class="task-list-title">Task list</h2>
+              <button class="task-add-mini-btn" id="btn-quick-add-task" title="Add a task" aria-label="Add a task">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="12" y1="5" x2="12" y2="19"></line>
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Task Items List matching image with checkboxes -->
+            <ul class="tasks-ul" id="tasks-ul">
+              <!-- Dynamically populated from JS with items like:
+                   - [x] Mathematic lesson
+                   - [x] Chemistry challenge
+                   - [x] Music assessment
+                   - [ ] Climbing Mt Semeru
+                   - [x] Dream concert 103
+              -->
+            </ul>
+
+            <!-- Task List Navigation Controls -->
+            <div class="task-list-footer">
+              <button class="task-nav-btn" id="task-prev-page" aria-label="Previous tasks page">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="15 18 9 12 15 6"/>
+                </svg>
+              </button>
+              <span class="task-page-info" id="task-page-info">1 / 2</span>
+              <button class="task-nav-btn" id="task-next-page" aria-label="Next tasks page">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="9 18 15 12 9 6"/>
+                </svg>
+              </button>
+            </div>
+          </article>
+
+        </div>
+
+        <!-- Bottom Area: Large Calendar Grid View -->
+        <article class="glass-card main-calendar-card" id="main-calendar-card">
+          
+          <!-- Month View Grid -->
+          <div class="calendar-view-container" id="calendar-month-view">
+            <!-- Day of Week Header: Mon, Tue, Wed, Thur, Fri, Sat, Sun -->
+            <div class="calendar-days-header">
+              <div class="day-col-name">Mon</div>
+              <div class="day-col-name">Tue</div>
+              <div class="day-col-name">Wed</div>
+              <div class="day-col-name">Thur</div>
+              <div class="day-col-name">Fri</div>
+              <div class="day-col-name">Sat</div>
+              <div class="day-col-name">Sun</div>
+            </div>
+
+            <!-- Calendar Grid 7x5 or 7x6 cells -->
+            <div class="calendar-cells-grid" id="calendar-cells-grid" role="grid" aria-label="Month Calendar Days">
+              <!-- Populated dynamically by JS matching image cards & events -->
+            </div>
+          </div>
+
+          <!-- Week View Container (when switched) -->
+          <div class="calendar-view-container" id="calendar-week-view" style="display:none;">
+            <div class="week-view-header" id="week-view-header"></div>
+            <div class="week-view-body" id="week-view-body"></div>
+          </div>
+
+          <!-- Day View Container (when switched) -->
+          <div class="calendar-view-container" id="calendar-day-view" style="display:none;">
+            <div class="day-view-timeline" id="day-view-timeline"></div>
+          </div>
+
+          <!-- Year View Container (when switched) -->
+          <div class="calendar-view-container" id="calendar-year-view" style="display:none;">
+            <div class="year-view-grid" id="year-view-grid"></div>
+          </div>
+
+        </article>
+
+      </section>
+    </main>
+
+  </div>
+
+  <!-- Quick Event Details / Action Modal -->
+  <dialog class="cosmic-modal" id="event-detail-modal">
+    <div class="modal-glass-box">
+      <div class="modal-header">
+        <div class="modal-tag-badge" id="modal-event-badge">Social</div>
+        <button class="modal-close-btn" id="modal-close-btn" aria-label="Close dialog">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <h3 class="modal-title" id="modal-event-title">Event Title</h3>
+        
+        <div class="modal-detail-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span id="modal-event-date">Thursday, 16 February 2022</span>
+        </div>
+
+        <div class="modal-detail-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span id="modal-event-time">09:30 AM - 14:00 PM</span>
+        </div>
+
+        <div class="modal-detail-row" id="modal-attendees-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <div class="modal-attendee-chips" id="modal-attendee-chips"></div>
+        </div>
+
+        <div class="modal-notes-box" id="modal-event-notes">
+          No additional notes provided.
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="modal-action-btn edit" id="btn-modal-edit">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          <span>Edit</span>
+        </button>
+        <button class="modal-action-btn delete" id="btn-modal-delete">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          <span>Delete</span>
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Add Task Modal -->
+  <dialog class="cosmic-modal" id="add-task-modal">
+    <div class="modal-glass-box">
+      <div class="modal-header">
+        <h3 class="modal-title" style="margin:0;">Add New Task</h3>
+        <button class="modal-close-btn" id="task-modal-close-btn">&times;</button>
+      </div>
+      <form id="new-task-form" onsubmit="return false;">
+        <div class="form-row" style="margin-top:16px;">
+          <input type="text" id="new-task-title-input" class="text-input" placeholder="e.g. Physics homework" required>
+        </div>
+        <div class="modal-actions" style="margin-top:20px;">
+          <button type="submit" class="glow-submit-btn" id="btn-save-task">Add Task</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- Add Collaborator Modal -->
+  <dialog class="cosmic-modal" id="add-collab-modal">
+    <div class="modal-glass-box">
+      <div class="modal-header">
+        <h3 class="modal-title" style="margin:0;">Add Collaborator</h3>
+        <button class="modal-close-btn" id="collab-modal-close-btn">&times;</button>
+      </div>
+      <div class="collab-picker-list" id="collab-picker-list">
+        <!-- Rendered with JS -->
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Toast Notification Message -->
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+  <!-- Main JavaScript application -->
+</body>
+</html>
